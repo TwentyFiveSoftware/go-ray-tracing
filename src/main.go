@@ -12,6 +12,8 @@ const WIDTH = 800
 const HEIGHT = 450
 
 func main() {
+	camera := NewCamera(Vec3{X: 12.0, Y: 2.0, Z: -3.0}, Vec3{X: 0.0, Y: 0.0, Z: 0.0}, 25.0, 0.0, 10.0)
+
 	img := image.NewRGBA(image.Rectangle{Min: image.Point{}, Max: image.Point{X: WIDTH, Y: HEIGHT}})
 
 	for y := 0; y < HEIGHT; y++ {
@@ -19,8 +21,9 @@ func main() {
 			u := float64(x) / (WIDTH - 1)
 			v := float64(y) / (HEIGHT - 1)
 
-			pixelColor := colorToRGB(Vec3{X: u, Y: v, Z: 0.25})
-			img.SetRGBA(x, y, pixelColor)
+			ray := camera.GetRay(u, v)
+			pixelColor := CalculateRayColor(ray)
+			img.SetRGBA(x, y, colorToRGB(pixelColor))
 		}
 	}
 
