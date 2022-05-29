@@ -9,10 +9,9 @@ type Camera struct {
 	verticalDirection   Vec3
 	up                  Vec3
 	right               Vec3
-	aperture            float64
 }
 
-func NewCamera(lookFrom Vec3, lookAt Vec3, fov float64, aperture float64, focusDistance float64) Camera {
+func NewCamera(lookFrom Vec3, lookAt Vec3, fov float64, focusDistance float64) Camera {
 	const aspectRatio = float64(Width) / float64(Height)
 
 	viewportHeight := math.Tan(fov/360.0*math.Pi) * 2.0
@@ -37,7 +36,6 @@ func NewCamera(lookFrom Vec3, lookAt Vec3, fov float64, aperture float64, focusD
 		verticalDirection,
 		up,
 		right,
-		aperture,
 	}
 }
 

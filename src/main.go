@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"image"
-	"image/color"
 	"image/png"
 	"math/rand"
 	"os"
@@ -12,10 +11,10 @@ import (
 const Width = 800
 const Height = 450
 const MaxRayTraceDepth = 50
-const SamplesPerPixel = 100
+const SamplesPerPixel = 1
 
 func main() {
-	camera := NewCamera(Vec3{12.0, 2.0, -3.0}, Vec3{0.0, 0.0, 0.0}, 25.0, 0.0, 10.0)
+	camera := NewCamera(Vec3{12.0, 2.0, -3.0}, Vec3{0.0, 0.0, 0.0}, 25.0, 10.0)
 	scene := GenerateScene()
 
 	img := image.NewRGBA(image.Rectangle{Min: image.Point{}, Max: image.Point{X: Width, Y: Height}})
@@ -35,24 +34,11 @@ func main() {
 			}
 
 			pixelColor = pixelColor.DivScalar(SamplesPerPixel)
-			img.SetRGBA(x, y, colorToRGB(pixelColor))
+			img.SetRGBA(x, y, ColorToRGB(pixelColor))
 		}
 	}
 
 	saveImage(img)
-}
-
-func colorToRGB(pixelColor Vec3) color.RGBA {
-	pixelColor = pixelColor.Sqrt()
-	pixelColor = pixelColor.Clamp(0.0, 1.0)
-	pixelColor = pixelColor.MulScalar(0xFF)
-
-	return color.RGBA{
-		R: uint8(pixelColor.X),
-		G: uint8(pixelColor.Y),
-		B: uint8(pixelColor.Z),
-		A: 0xFF,
-	}
 }
 
 func saveImage(image image.Image) {
@@ -69,5 +55,9 @@ func saveImage(image image.Image) {
 		return
 	}
 
-	defer f.Close()
+	err = f.Close()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }
