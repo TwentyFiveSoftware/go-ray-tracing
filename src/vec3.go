@@ -87,6 +87,22 @@ func (v Vec3) Normalized() Vec3 {
 	return v.DivScalar(v.Length())
 }
 
+func (v Vec3) Sqrt() Vec3 {
+	return Vec3{
+		X: math.Sqrt(v.X),
+		Y: math.Sqrt(v.Y),
+		Z: math.Sqrt(v.Z),
+	}
+}
+
+func (v Vec3) Clamp(min float64, max float64) Vec3 {
+	return Vec3{
+		X: math.Min(max, math.Max(min, v.X)),
+		Y: math.Min(max, math.Max(min, v.Y)),
+		Z: math.Min(max, math.Max(min, v.Z)),
+	}
+}
+
 func (v Vec3) IsNearZero() bool {
 	const EPSILON = 1e-8
 	return math.Abs(v.X) < EPSILON && math.Abs(v.Y) < EPSILON && math.Abs(v.Z) < EPSILON
