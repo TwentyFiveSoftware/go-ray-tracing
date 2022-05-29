@@ -3,8 +3,9 @@ package main
 import "math"
 
 type Sphere struct {
-	center Vec3
-	radius float64
+	center   Vec3
+	radius   float64
+	material Material
 }
 
 func (sphere *Sphere) RayHitSphere(ray Ray, tMin float64, tMax float64) HitRecord {
@@ -36,5 +37,5 @@ func (sphere *Sphere) RayHitSphere(ray Ray, tMin float64, tMax float64) HitRecor
 		normal = normal.Neg()
 	}
 
-	return HitRecord{true, t, point, normal, isFrontFace}
+	return HitRecord{true, t, point, normal, isFrontFace, sphere.material}
 }

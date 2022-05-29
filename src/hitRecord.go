@@ -6,4 +6,5 @@ type HitRecord struct {
 	point       Vec3
 	normal      Vec3
 	isFrontFace bool
+	material    Material
 }

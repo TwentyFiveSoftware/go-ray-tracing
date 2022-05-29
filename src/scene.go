@@ -12,6 +12,10 @@ func GenerateScene() Scene {
 	spheres = append(spheres, Sphere{
 		center: Vec3{0, 0, -1},
 		radius: 0.5,
+		material: Material{
+			materialType:    MaterialTypeDielectric,
+			refractionIndex: 1.5,
+		},
 	})
 
 	return Scene{spheres}
