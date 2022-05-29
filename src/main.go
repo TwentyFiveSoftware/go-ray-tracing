@@ -8,21 +8,23 @@ import (
 	"os"
 )
 
-const WIDTH = 800
-const HEIGHT = 450
+const Width = 800
+const Height = 450
+const MaxRayTraceDepth = 50
 
 func main() {
-	camera := NewCamera(Vec3{X: 12.0, Y: 2.0, Z: -3.0}, Vec3{X: 0.0, Y: 0.0, Z: 0.0}, 25.0, 0.0, 10.0)
+	camera := NewCamera(Vec3{12.0, 2.0, -3.0}, Vec3{0.0, 0.0, 0.0}, 25.0, 0.0, 10.0)
+	scene := GenerateScene()
 
-	img := image.NewRGBA(image.Rectangle{Min: image.Point{}, Max: image.Point{X: WIDTH, Y: HEIGHT}})
+	img := image.NewRGBA(image.Rectangle{Min: image.Point{}, Max: image.Point{X: Width, Y: Height}})
 
-	for y := 0; y < HEIGHT; y++ {
-		for x := 0; x < WIDTH; x++ {
-			u := float64(x) / (WIDTH - 1)
-			v := float64(y) / (HEIGHT - 1)
+	for y := 0; y < Height; y++ {
+		for x := 0; x < Width; x++ {
+			u := float64(x) / (Width - 1)
+			v := float64(y) / (Height - 1)
 
 			ray := camera.GetRay(u, v)
-			pixelColor := CalculateRayColor(ray)
+			pixelColor := CalculateRayColor(scene, ray, MaxRayTraceDepth)
 			img.SetRGBA(x, y, colorToRGB(pixelColor))
 		}
 	}
