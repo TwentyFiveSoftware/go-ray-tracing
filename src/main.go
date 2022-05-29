@@ -3,38 +3,55 @@ package main
 import (
 	"fmt"
 	"image"
+	"image/color"
 	"image/png"
-	"math/rand"
 	"os"
+	"sync"
 )
 
 const Width = 800
 const Height = 450
 const MaxRayTraceDepth = 50
-const SamplesPerPixel = 1
+const SamplesPerPixel = 100
+const RenderThreads = 24
 
 func main() {
 	camera := NewCamera(Vec3{12.0, 2.0, -3.0}, Vec3{0.0, 0.0, 0.0}, 25.0, 10.0)
 	scene := GenerateScene()
 
-	img := image.NewRGBA(image.Rectangle{Min: image.Point{}, Max: image.Point{X: Width, Y: Height}})
-
+	yChannel := make(chan int, Height)
 	for y := 0; y < Height; y++ {
-		fmt.Printf("%d / %d (%.2f%%)\n", y+1, Height, float64(y+1)*100.0/Height)
+		yChannel <- y
+	}
+	close(yChannel)
 
-		for x := 0; x < Width; x++ {
-			pixelColor := Vec3{}
+	type RowData struct {
+		y   int
+		row []color.RGBA
+	}
 
-			for sample := 0; sample < SamplesPerPixel; sample++ {
-				u := (float64(x) + rand.Float64()) / (Width - 1)
-				v := (float64(y) + rand.Float64()) / (Height - 1)
+	rowsChannel := make(chan RowData, Height)
+	var waitGroup sync.WaitGroup
 
-				ray := camera.GetRay(u, v)
-				pixelColor = pixelColor.Add(CalculateRayColor(scene, ray, MaxRayTraceDepth))
+	for thread := 0; thread < RenderThreads; thread++ {
+		waitGroup.Add(1)
+		go func() {
+			for y := range yChannel {
+				fmt.Printf("%d / %d (%.2f%%)\n", y+1, Height, float64(y+1)*100.0/Height)
+				rowsChannel <- RowData{y, RenderRow(y, camera, scene)}
 			}
 
-			pixelColor = pixelColor.DivScalar(SamplesPerPixel)
-			img.SetRGBA(x, y, ColorToRGB(pixelColor))
+			waitGroup.Done()
+		}()
+	}
+
+	waitGroup.Wait()
+	close(rowsChannel)
+
+	img := image.NewRGBA(image.Rectangle{Min: image.Point{}, Max: image.Point{X: Width, Y: Height}})
+	for row := range rowsChannel {
+		for x, rgb := range row.row {
+			img.SetRGBA(x, row.y, rgb)
 		}
 	}
 
