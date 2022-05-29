@@ -7,13 +7,14 @@ import (
 	"image/png"
 	"os"
 	"sync"
+	"time"
 )
 
-const Width = 800
-const Height = 450
+const Width = 1920
+const Height = 1080
 const MaxRayTraceDepth = 50
 const SamplesPerPixel = 100
-const RenderThreads = 24
+const RenderGoroutines = 24
 
 func main() {
 	camera := NewCamera(Vec3{12.0, 2.0, -3.0}, Vec3{0.0, 0.0, 0.0}, 25.0, 10.0)
@@ -33,7 +34,9 @@ func main() {
 	rowsChannel := make(chan RowData, Height)
 	var waitGroup sync.WaitGroup
 
-	for thread := 0; thread < RenderThreads; thread++ {
+	renderStartTime := time.Now()
+
+	for i := 0; i < RenderGoroutines; i++ {
 		waitGroup.Add(1)
 		go func() {
 			for y := range yChannel {
@@ -46,9 +49,14 @@ func main() {
 	}
 
 	waitGroup.Wait()
-	close(rowsChannel)
+
+	elapsedRenderTime := time.Since(renderStartTime)
+	fmt.Printf("Rendered %d samples/pixel with %d goroutines in %d ms",
+		SamplesPerPixel, RenderGoroutines, elapsedRenderTime.Milliseconds())
 
 	img := image.NewRGBA(image.Rectangle{Min: image.Point{}, Max: image.Point{X: Width, Y: Height}})
+
+	close(rowsChannel)
 	for row := range rowsChannel {
 		for x, rgb := range row.row {
 			img.SetRGBA(x, row.y, rgb)
