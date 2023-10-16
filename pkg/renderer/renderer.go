@@ -35,13 +35,14 @@ func calculateRayColor(scene scene.Scene, ray ray.Ray, depth int) vec3.Vec3 {
 		return vec3.Vec3{}
 	}
 
-	if hitRecord := scene.RayHitScene(ray); hitRecord.DoesHit {
+	hitRecord := scene.RayHitScene(ray)
+	if hitRecord != nil {
 		scatterRecord := hitRecord.Material.Scatter(ray, hitRecord.Point, hitRecord.Normal, hitRecord.IsFrontFace)
-		if scatterRecord.DoesScatter {
-			return scatterRecord.Attenuation.Mul(calculateRayColor(scene, scatterRecord.ScatteredRay, depth-1))
+		if scatterRecord == nil {
+			return vec3.Vec3{}
 		}
 
-		return vec3.Vec3{}
+		return scatterRecord.Attenuation.Mul(calculateRayColor(scene, scatterRecord.ScatteredRay, depth-1))
 	}
 
 	t := 0.5 * (ray.Direction.Normalized().Y + 1.0)

@@ -15,7 +15,7 @@ type Sphere struct {
 	Material material.Material
 }
 
-func (sphere *Sphere) RayHitSphere(ray ray.Ray, tMin float64, tMax float64) hitRecord.HitRecord {
+func (sphere *Sphere) RayHitSphere(ray ray.Ray, tMin float64, tMax float64) *hitRecord.HitRecord {
 	oc := ray.Origin.Sub(sphere.Center)
 	a := ray.Direction.Dot(ray.Direction)
 	halfB := oc.Dot(ray.Direction)
@@ -23,7 +23,7 @@ func (sphere *Sphere) RayHitSphere(ray ray.Ray, tMin float64, tMax float64) hitR
 	discriminant := halfB*halfB - a*c
 
 	if discriminant < 0.0 {
-		return hitRecord.HitRecord{}
+		return nil
 	}
 
 	sqrtD := math.Sqrt(discriminant)
@@ -32,7 +32,7 @@ func (sphere *Sphere) RayHitSphere(ray ray.Ray, tMin float64, tMax float64) hitR
 		t = (-halfB + sqrtD) / a
 
 		if t < tMin || t > tMax {
-			return hitRecord.HitRecord{}
+			return nil
 		}
 	}
 
@@ -44,8 +44,7 @@ func (sphere *Sphere) RayHitSphere(ray ray.Ray, tMin float64, tMax float64) hitR
 		normal = normal.Neg()
 	}
 
-	return hitRecord.HitRecord{
-		DoesHit:     true,
+	return &hitRecord.HitRecord{
 		T:           t,
 		Point:       point,
 		Normal:      normal,

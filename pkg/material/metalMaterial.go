@@ -11,11 +11,14 @@ type MetalMaterial struct {
 	Texture texture.Texture
 }
 
-func (m *MetalMaterial) Scatter(incomingRay ray.Ray, point vec3.Vec3, normal vec3.Vec3, _ bool) scatterRecord.ScatterRecord {
+func (m *MetalMaterial) Scatter(incomingRay ray.Ray, point vec3.Vec3, normal vec3.Vec3, _ bool) *scatterRecord.ScatterRecord {
 	scatterDirection := incomingRay.Direction.Normalized().Reflect(normal)
 
-	return scatterRecord.ScatterRecord{
-		DoesScatter: normal.Dot(scatterDirection) > 0.0,
+	if normal.Dot(scatterDirection) <= 0.0 {
+		return nil
+	}
+
+	return &scatterRecord.ScatterRecord{
 		Attenuation: m.Texture.GetColorAt(point),
 		ScatteredRay: ray.Ray{
 			Origin:    point,

@@ -75,14 +75,17 @@ func GenerateScene() Scene {
 	return Scene{spheres}
 }
 
-func (scene *Scene) RayHitScene(ray ray.Ray) hitRecord.HitRecord {
-	currentRecord := hitRecord.HitRecord{T: math.Inf(1)}
+func (scene *Scene) RayHitScene(ray ray.Ray) *hitRecord.HitRecord {
+	var nearestHitRecord *hitRecord.HitRecord
+	minT := math.Inf(1)
 
 	for _, sphereInScene := range scene.spheres {
-		if hitRecord := sphereInScene.RayHitSphere(ray, 0.001, currentRecord.T); hitRecord.DoesHit {
-			currentRecord = hitRecord
+		currentHitRecord := sphereInScene.RayHitSphere(ray, 0.001, minT)
+		if currentHitRecord != nil {
+			nearestHitRecord = currentHitRecord
+			minT = currentHitRecord.T
 		}
 	}
 
-	return currentRecord
+	return nearestHitRecord
 }

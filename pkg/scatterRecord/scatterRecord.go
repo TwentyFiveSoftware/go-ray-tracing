@@ -6,7 +6,6 @@ import (
 )
 
 type ScatterRecord struct {
-	DoesScatter  bool
 	Attenuation  vec3.Vec3
 	ScatteredRay ray.Ray
 }

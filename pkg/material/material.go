@@ -7,5 +7,5 @@ import (
 )
 
 type Material interface {
-	Scatter(incomingRay ray.Ray, point vec3.Vec3, normal vec3.Vec3, isFrontFace bool) scatterRecord.ScatterRecord
+	Scatter(incomingRay ray.Ray, point vec3.Vec3, normal vec3.Vec3, isFrontFace bool) *scatterRecord.ScatterRecord
 }
