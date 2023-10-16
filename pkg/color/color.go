@@ -1,15 +1,17 @@
-package main
+package color
 
 import (
 	"math"
 	"math/rand"
+
+	"go-ray-tracing/pkg/vec3"
 )
 
-func GetRandomColor() Vec3 {
+func GetRandomColor() vec3.Vec3 {
 	return hsvToRGB(rand.Float64()*360.0, 0.75, 0.45)
 }
 
-func hsvToRGB(h float64, s float64, v float64) Vec3 {
+func hsvToRGB(h float64, s float64, v float64) vec3.Vec3 {
 	c := s * v
 	x := c * (1.0 - math.Abs(math.Mod(h/60.0, 2.0)-1.0))
 	m := v - c
@@ -44,5 +46,5 @@ func hsvToRGB(h float64, s float64, v float64) Vec3 {
 		b = x
 	}
 
-	return Vec3{r + m, g + m, b + m}
+	return vec3.Vec3{X: r + m, Y: g + m, Z: b + m}
 }
